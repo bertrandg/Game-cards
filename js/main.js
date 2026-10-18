@@ -146,7 +146,7 @@ function setup(gameId) {
       </form>
       <div class="setup-foot">
         <button class="btn primary big" data-start ${ok ? '' : 'disabled'}>
-          ${ok ? (selected.length === 1 ? 'Jouer contre l\'ordinateur' : 'C\'est parti !') : selected.length < min ? `Encore ${min - selected.length} joueur(s)` : `${max} joueurs maximum`}
+          ${ok ? (selected.length === 1 ? 'Jouer contre l\'ordinateur' : g.minTable && selected.length < g.minTable ? 'Jouer avec des robots' : 'C\'est parti !') : selected.length < min ? `Encore ${min - selected.length} joueur(s)` : `${max} joueurs maximum`}
         </button>
       </div>
     </div>`;

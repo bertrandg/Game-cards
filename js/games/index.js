@@ -39,6 +39,19 @@ export const GAMES = [
     css: ['css/deck.css', 'css/eights.css'],
     load: () => import('./eights/index.js'),
   },
+  {
+    id: 'president',
+    name: 'Président',
+    tagline: 'Débarrassez-vous de vos cartes pour devenir Président… et faire payer le Pauvre !',
+    players: [1, 6],
+    solo: 'Avec moins de 3 joueurs, des robots complètent la table.',
+    minTable: 3, // en dessous, des robots complètent
+    duration: '30 min',
+    emoji: '👑',
+    tint: ['#f2b84b', '#8e7cc3'],
+    css: ['css/deck.css', 'css/president.css'],
+    load: () => import('./president/index.js'),
+  },
 ];
 
 export const gameById = (id) => GAMES.find((g) => g.id === id);

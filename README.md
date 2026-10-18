@@ -22,7 +22,7 @@ Application web pensée pour le navigateur mobile, sans installation (elle peut 
 
 ## Ce que fait l'application
 
-- **Menu des jeux** : Sea Salt & Paper, la Bataille navale et le Huit américain ; d'autres viendront s'ajouter.
+- **Menu des jeux** : Sea Salt & Paper, la Bataille navale, le Huit américain et le Président ; d'autres viendront s'ajouter.
 - **Joueurs enregistrés** sur le téléphone (nom, couleur, victoires par jeu).
 - **Parties en cours sauvegardées automatiquement** après chaque action : on peut fermer le navigateur et reprendre plus tard.
 - **Passage du téléphone** : avant chaque tour, un écran cache tout et annonce le prochain joueur, avec un résumé de ce qui s'est passé depuis son dernier tour.
@@ -65,6 +65,16 @@ Avec un jeu classique de 52 cartes :
 - la partie s'arrête quand un joueur atteint 100 points : le plus petit score gagne ;
 - seul, on joue contre deux robots.
 
+### Président (1 à 6 joueurs)
+
+Avec un jeu classique de 52 cartes, toutes distribuées :
+- ordre des valeurs : 3 < 4 < … < Roi < As < 2 ;
+- on pose 1 à 4 cartes de même valeur ; les suivants posent le même nombre de cartes, de valeur égale ou supérieure, ou passent ;
+- après une valeur égale, le joueur suivant doit poser cette valeur « ou rien » ; un 2 ferme le pli ;
+- rôles par ordre de sortie : Président, Vice-président, Citoyens, Vice-pauvre, Pauvre ; à la manche suivante, le Pauvre donne ses 2 meilleures cartes au Président qui lui en rend 2 de son choix (1 carte entre les vices) ;
+- 5 manches ; à chaque manche, le Président marque autant de points qu'il y a d'autres joueurs, puis un de moins à chaque place ;
+- avec moins de 3 joueurs, des robots complètent la table (jusqu'à 4).
+
 ## Lancer en local
 
 Les modules JavaScript doivent être servis en HTTP (ouvrir `index.html` directement ne marche pas) :
@@ -94,6 +104,7 @@ Le workflow `.github/workflows/pages.yml` publie le site à chaque push sur `mai
 - `js/games/seasalt/` : Sea Salt & Paper — `cards.js` (les 58 cartes), `rules.js` (moteur de règles sans interface), `view.js` (table de jeu) ; styles dans `css/seasalt.css`
 - `js/games/naval/` : Bataille navale — `rules.js` (moteur), `ai.js` (l'ordinateur), `view.js` (grilles et effets) ; styles dans `css/naval.css`
 - `js/games/eights/` : Huit américain — `rules.js` (moteur), `ai.js` (les robots), `view.js` (table) ; styles dans `css/eights.css`
+- `js/games/president/` : Président — `rules.js` (moteur), `ai.js` (les robots), `view.js` (table) ; styles dans `css/president.css`
 - `css/app.css` contient aussi les éléments communs aux jeux (barre du haut, fenêtres, écran « passez le téléphone », règles)
 
 ## Ajouter un jeu
