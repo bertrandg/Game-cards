@@ -1,0 +1,200 @@
+/* Bataille navale : mer calme en papier, navires en bois, plouf et explosions */
+
+.bn {
+  min-height: 100dvh; max-width: 560px; margin: 0 auto;
+  display: flex; flex-direction: column;
+  padding: var(--safe-t) 0 calc(8px + var(--safe-b));
+}
+
+/* ---------- grilles ---------- */
+.board {
+  --cs: calc(var(--bs) / 10);
+  display: grid; grid-template-columns: 18px var(--bs); grid-template-rows: 18px var(--bs);
+  margin: 0 auto; width: max-content;
+}
+.board.nolab { grid-template-columns: var(--bs); grid-template-rows: var(--bs); }
+.cols { grid-column: 2; grid-row: 1; display: grid; grid-template-columns: repeat(10, 1fr); }
+.rows { grid-column: 1; grid-row: 2; display: grid; grid-template-rows: repeat(10, 1fr); }
+.cols span, .rows span { display: grid; place-items: center; font-size: .68rem; font-weight: 800; color: var(--muted); }
+.grid {
+  grid-column: 2; grid-row: 2; position: relative;
+  display: grid; grid-template-columns: repeat(10, 1fr); grid-template-rows: repeat(10, 1fr);
+  border-radius: 12px; overflow: hidden;
+  background:
+    repeating-radial-gradient(ellipse at 30% 120%, transparent 0 14px, rgba(255, 255, 255, .13) 15px 16px, transparent 17px 30px),
+    linear-gradient(170deg, #9fd6d6, #6fb8bd);
+  box-shadow: inset 0 0 0 3px rgba(255, 250, 242, .7), 0 6px 16px rgba(61, 120, 130, .25);
+}
+.nolab .grid { grid-column: 1; grid-row: 1; border-radius: 10px; }
+.cell {
+  position: relative; z-index: 1; border: 0; padding: 0; margin: 0; background: none;
+  box-shadow: inset -1px -1px 0 rgba(255, 255, 255, .28);
+}
+.cell::after { content: ''; position: absolute; inset: 0; margin: auto; border-radius: 50%; }
+.cell.v1::after { /* dans l'eau */
+  width: 34%; height: 34%;
+  background: #fffaf2; box-shadow: 0 0 0 calc(var(--cs) * .08) rgba(255, 250, 242, .45);
+}
+.cell.v2::after { /* touché */
+  width: 52%; height: 52%;
+  background: radial-gradient(circle at 40% 35%, #ffd27a 0 18%, #f08a4b 40%, #c8553d 75%);
+  box-shadow: 0 0 calc(var(--cs) * .3) rgba(240, 120, 60, .8);
+  animation: ember 1.8s ease-in-out infinite;
+}
+.cell.v3::after { /* eau déduite */
+  width: 14%; height: 14%; background: rgba(255, 250, 242, .55);
+}
+.cell.new::after { animation: pop .45s cubic-bezier(.3, 1.6, .5, 1) var(--d, 0ms) backwards; }
+.cell.v2.new::after { animation: pop .45s cubic-bezier(.3, 1.6, .5, 1) backwards, ember 1.8s ease-in-out .45s infinite; }
+@keyframes ember { 50% { box-shadow: 0 0 calc(var(--cs) * .5) rgba(255, 150, 70, .95); } }
+
+.grid.live .cell.open:active { background: rgba(255, 250, 242, .35); }
+.cell.aim { background: rgba(255, 250, 242, .3); }
+.cell.aim::after {
+  width: 78%; height: 78%; border: calc(var(--cs) * .08) solid #c8553d;
+  background:
+    linear-gradient(#c8553d, #c8553d) center / calc(var(--cs) * .07) 100% no-repeat,
+    linear-gradient(#c8553d, #c8553d) center / 100% calc(var(--cs) * .07) no-repeat;
+  animation: aim 1s ease-in-out infinite;
+}
+@keyframes aim { 50% { transform: scale(.82) rotate(45deg); } }
+
+/* ---------- navires ---------- */
+.ship {
+  position: absolute; z-index: 0; pointer-events: none;
+  left: calc(var(--c) * 10%); top: calc(var(--r) * 10%);
+  width: 10%; height: 10%; padding: calc(var(--cs) * .1);
+  transition: left .18s, top .18s;
+}
+.ship.h { width: calc(var(--len) * 10%); }
+.ship.v { height: calc(var(--len) * 10%); }
+.ship i {
+  display: block; width: 100%; height: 100%;
+  background:
+    radial-gradient(circle, #7b6250 0 calc(var(--cs) * .09), transparent calc(var(--cs) * .1)) center / var(--cs) var(--cs) repeat,
+    linear-gradient(var(--deck-a, 180deg), #fbf0de, #e6cba4);
+  box-shadow: inset 0 0 0 calc(var(--cs) * .07) #8a6a52, 0 calc(var(--cs) * .06) calc(var(--cs) * .12) rgba(40, 60, 70, .35);
+}
+.ship.h i { border-radius: calc(var(--cs) * .22) calc(var(--cs) * .5) calc(var(--cs) * .5) calc(var(--cs) * .22); background-position: calc(var(--cs) * -.1) center, 0 0; }
+.ship.v i { --deck-a: 90deg; border-radius: calc(var(--cs) * .5) calc(var(--cs) * .5) calc(var(--cs) * .22) calc(var(--cs) * .22); background-position: center calc(var(--cs) * -.1), 0 0; }
+.ship.sunk i {
+  background:
+    repeating-linear-gradient(45deg, rgba(0, 0, 0, .12) 0 3px, transparent 3px 7px),
+    linear-gradient(var(--deck-a, 180deg), #8e8077, #5e534d);
+  box-shadow: inset 0 0 0 calc(var(--cs) * .07) #4a3a30;
+  opacity: .85;
+}
+.ship.ghost i { opacity: .55; box-shadow: inset 0 0 0 calc(var(--cs) * .07) #8a6a52; }
+.ship.sinking i { animation: sink 1.2s ease-in-out; }
+@keyframes sink {
+  0% { transform: none; filter: brightness(1.4); }
+  25% { transform: rotate(-3deg) translateY(-6%); }
+  55% { transform: rotate(2.5deg) translateY(4%); }
+  80% { transform: rotate(-1deg); }
+}
+
+/* placement : on attrape les navires */
+.b-place .grid { touch-action: none; }
+.b-place .ship { z-index: 2; pointer-events: auto; cursor: grab; }
+.b-place .ship.sel i { box-shadow: inset 0 0 0 calc(var(--cs) * .07) #8a6a52, 0 0 0 3px var(--gold), 0 6px 14px rgba(40, 60, 70, .35); }
+.b-place .ship.dragging { transition: none; z-index: 3; }
+.b-place .ship.dragging i { transform: scale(1.06); }
+.b-place .ship.bad i { background: linear-gradient(#f6b9a6, #e07a5f); }
+
+/* ---------- mise en page ---------- */
+.place { padding: 0 12px; display: flex; flex-direction: column; gap: 10px; }
+.place h2 { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 1.3rem; }
+.place > p { margin: 0; text-align: center; font-size: .85rem; line-height: 1.35; }
+.dock { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.dock button {
+  display: flex; align-items: center; gap: 6px; border: 0; border-radius: 999px; padding: 6px 11px;
+  background: var(--paper); box-shadow: 0 1px 3px rgba(120, 80, 40, .15); font-weight: 700; font-size: .78rem;
+}
+.dock button.on { background: #fff0c9; box-shadow: inset 0 0 0 2px var(--gold); }
+.segs { display: inline-flex; gap: 2px; }
+.segs i { width: 8px; height: 8px; border-radius: 2px; background: #8a6a52; }
+
+.side-head { display: flex; align-items: center; gap: 7px; font-size: .9rem; min-width: 0; }
+.side-head .avatar { width: 24px; height: 24px; font-size: .8rem; }
+.side-head b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.enemy { padding: 0 12px; }
+.enemy .side-head { margin: 0 0 6px 18px; }
+.enemy .fleet { margin-left: auto; flex-wrap: nowrap; gap: 4px; flex: none; }
+
+.fleet { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; flex-wrap: wrap; }
+.fleet li { display: flex; align-items: center; gap: 6px; }
+.fleet .segs i { width: 6px; height: 6px; background: var(--sea); }
+.fleet li.down .segs i { background: var(--danger); opacity: .45; }
+.fleet.named { flex-direction: column; gap: 3px; }
+.fleet.named small { font-size: .74rem; font-weight: 700; }
+.fleet.named li.down small { text-decoration: line-through; color: var(--muted); }
+
+.bn-status {
+  min-height: 3em; padding: 6px 16px; text-align: center; font-size: .9rem; color: #6d5646;
+  display: flex; flex-direction: column; justify-content: center; gap: 2px;
+}
+.bn-status .recv { color: var(--accent-dark); font-weight: 800; }
+.mine { display: flex; gap: 14px; align-items: center; justify-content: center; padding: 0 12px; }
+.mine .board { margin: 0; }
+.mine-info { display: grid; gap: 8px; min-width: 0; }
+.mine-info small { font-size: .75rem; }
+.bn-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; min-height: 48px; margin-top: 10px; padding: 0 12px; }
+.btn.fire { animation: glow-fire 1.4s ease-in-out infinite; }
+@keyframes glow-fire { 50% { box-shadow: 0 4px 0 var(--accent-dark), 0 0 0 7px rgba(224, 122, 95, .3); } }
+
+.board.shake { animation: shake .35s; }
+@keyframes shake {
+  20% { transform: translate(-4px, 2px); } 40% { transform: translate(4px, -2px); }
+  60% { transform: translate(-3px, -1px); } 80% { transform: translate(2px, 1px); }
+}
+
+/* ---------- effets ---------- */
+.fx { position: fixed; z-index: 150; pointer-events: none; width: 0; height: 0; }
+.fx.ball {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #8c7a6e, #3b302a 70%);
+  box-shadow: 0 0 10px rgba(255, 190, 120, .7);
+}
+.splash i {
+  position: absolute; left: 0; top: 0; width: calc(var(--w) * 1.2); height: calc(var(--w) * 1.2);
+  translate: -50% -50%; border-radius: 50%; border: 2px solid #fffaf2;
+  animation: ring .8s ease-out forwards;
+}
+.splash i:nth-child(2) { animation-delay: .1s; }
+.splash i:nth-child(3) { animation-delay: .2s; }
+@keyframes ring { from { transform: scale(.2); opacity: 1; } to { transform: scale(1.8); opacity: 0; } }
+.splash b {
+  position: absolute; left: 0; top: 0; width: 6px; height: 9px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: #e6f6f6; animation: drop .6s ease-out forwards;
+}
+.splash b:nth-of-type(1) { --x: -14px; }
+.splash b:nth-of-type(2) { --x: 2px; animation-delay: .05s; }
+.splash b:nth-of-type(3) { --x: 14px; }
+@keyframes drop {
+  0% { transform: translate(-50%, 0) scale(.5); opacity: 1; }
+  50% { transform: translate(calc(-50% + var(--x)), -22px) scale(1); }
+  100% { transform: translate(calc(-50% + var(--x) * 1.4), 4px) scale(.6); opacity: 0; }
+}
+.boom::before {
+  content: ''; position: absolute; left: 0; top: 0; width: calc(var(--w) * 2.2); height: calc(var(--w) * 2.2);
+  translate: -50% -50%; border-radius: 50%;
+  background: radial-gradient(circle, #fff3c4 0 15%, #ffc861 30%, #f08a4b 50%, rgba(200, 85, 61, 0) 70%);
+  animation: blast .6s ease-out forwards;
+}
+.boom.big::before { width: calc(var(--w) * 3.4); height: calc(var(--w) * 3.4); animation-duration: .9s; }
+@keyframes blast { from { transform: scale(.1); opacity: 1; } 60% { opacity: .9; } to { transform: scale(1); opacity: 0; } }
+.boom i {
+  position: absolute; left: 0; top: 0; width: 5px; height: 5px; border-radius: 50%; background: #ffb347;
+  animation: spark .7s ease-out forwards;
+}
+@keyframes spark {
+  from { transform: rotate(var(--a)) translateX(0); opacity: 1; }
+  to { transform: rotate(var(--a)) translateX(calc(var(--w) * var(--l) * 1.4)) scale(.3); opacity: 0; }
+}
+
+/* ---------- fenêtres ---------- */
+.ranking em { display: grid; text-align: right; }
+.ranking em small { font-weight: 600; color: var(--muted); font-size: .75rem; }
+.fleet-rules { list-style: none; padding: 0 !important; display: grid; gap: 6px; }
+.fleet-rules li { display: flex; align-items: center; gap: 8px; }
+.fleet-rules .segs { min-width: 52px; }

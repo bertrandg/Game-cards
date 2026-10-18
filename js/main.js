@@ -48,7 +48,7 @@ function home() {
     <header class="hero">
       <div class="hero-cards" aria-hidden="true"><span>🐚</span><span>🦀</span><span>⛵</span></div>
       <h1>Petite Partie</h1>
-      <p>Des jeux de cartes à partager, sur un seul téléphone.</p>
+      <p>Des petits jeux à partager, sur un seul téléphone.</p>
     </header>
 
     ${saves.length ? `
@@ -131,7 +131,7 @@ function setup(gameId) {
         <button class="icon-btn" data-go="#/" aria-label="Retour">‹</button>
         <h1>${esc(g.name)}</h1>
       </header>
-      <p class="lead">Qui joue ? Touchez les joueurs dans l'ordre où ils sont assis autour de la table (${min} à ${max}).</p>
+      <p class="lead">Qui joue ? Touchez les joueurs dans l'ordre où ils sont assis autour de la table (${min} à ${max}).${g.solo ? ` ${esc(g.solo)}` : ''}</p>
       <div class="pick">
         ${players.map((p) => {
           const i = selected.indexOf(p.id);
@@ -146,7 +146,7 @@ function setup(gameId) {
       </form>
       <div class="setup-foot">
         <button class="btn primary big" data-start ${ok ? '' : 'disabled'}>
-          ${ok ? 'C\'est parti !' : selected.length < min ? `Encore ${min - selected.length} joueur(s)` : `${max} joueurs maximum`}
+          ${ok ? (selected.length === 1 ? 'Jouer contre l\'ordinateur' : 'C\'est parti !') : selected.length < min ? `Encore ${min - selected.length} joueur(s)` : `${max} joueurs maximum`}
         </button>
       </div>
     </div>`;
@@ -255,7 +255,7 @@ async function play(saveId) {
   if (!save) { toast('Partie introuvable'); return go('#/'); }
   const g = gameById(save.gameId);
   app.onclick = app.onsubmit = null;
-  app.innerHTML = '<div class="loading">Mélange des cartes…</div>';
+  app.innerHTML = `<div class="loading">${esc(g.loading || 'Mélange des cartes…')}</div>`;
   const [mod] = await Promise.all([g.load().then((m) => m.default), loadCSS(g.css)]);
   if (location.hash !== `#/play/${saveId}`) return; // on a quitté pendant le chargement
   let finished = false;
