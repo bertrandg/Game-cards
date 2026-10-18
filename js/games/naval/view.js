@@ -234,7 +234,7 @@ export function mount(root, s, host) {
     if (ui.hide) return ui.hide.board === 'enemy' ? '🚀 Feu !' : `🚀 ${esc(P(opp(me)).name)} tire…`;
     const l = s.last;
     if (s.current !== me && l?.by === me) return `${lastText(l, true)}`;
-    if (ui.aim != null) return `Cible <b>${R.cellName(ui.aim)}</b> : touchez à nouveau ou appuyez sur Feu.`;
+    if (ui.aim != null) return `<span>Cible <b>${R.cellName(ui.aim)}</b> : touchez à nouveau ou appuyez sur Feu.</span>`;
     const before = l && l.by !== me ? `<span class="recv">${esc(P(l.by).name)} : ${lastText(l, false)}</span>` : '';
     return `${before}<span>À vous ! Touchez une case de la grille adverse.</span>`;
   }

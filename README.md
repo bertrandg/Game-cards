@@ -5,6 +5,19 @@ Application web pensée pour le navigateur mobile, sans installation (elle peut 
 
 **▶ Jouer : https://bertrandg.github.io/Game-cards/**
 
+<table>
+  <tr>
+    <th>Accueil</th>
+    <th>Sea Salt &amp; Paper</th>
+    <th>Bataille navale</th>
+  </tr>
+  <tr>
+    <td><img src="docs/home.png" width="250" alt="Accueil : parties en cours et choix du jeu"></td>
+    <td><img src="docs/seasalt.png" width="250" alt="Sea Salt &amp; Paper : pioche, défausses et main du joueur"></td>
+    <td><img src="docs/naval.png" width="250" alt="Bataille navale : grille adverse, tir visé et flotte du joueur"></td>
+  </tr>
+</table>
+
 ## Ce que fait l'application
 
 - **Menu des jeux** : Sea Salt & Paper et la Bataille navale, d'autres viendront s'ajouter.
@@ -60,6 +73,7 @@ Le workflow `.github/workflows/pages.yml` publie le site à chaque push sur `mai
 - `js/ui/dialog.js` : confirmations, saisie, messages
 - `js/ui/sound.js` : bruitages générés en WebAudio — cartes, tirs, plouf, explosions (coupables depuis le menu du jeu)
 - `js/ui/fullscreen.js` : bouton plein écran (masqué sur iPhone, où Safari ne le permet pas)
+- `docs/` : captures d'écran du README
 - `js/games/index.js` : registre des jeux
 - `js/games/seasalt/` : Sea Salt & Paper — `cards.js` (les 58 cartes), `rules.js` (moteur de règles sans interface), `view.js` (table de jeu) ; styles dans `css/seasalt.css`
 - `js/games/naval/` : Bataille navale — `rules.js` (moteur), `ai.js` (l'ordinateur), `view.js` (grilles et effets) ; styles dans `css/naval.css`
