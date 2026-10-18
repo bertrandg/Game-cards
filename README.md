@@ -3,7 +3,7 @@
 Des jeux de cartes à partager **sur un seul téléphone** : chacun joue à son tour puis passe le téléphone au suivant.
 Application web pensée pour le navigateur mobile, sans installation (elle peut aussi être ajoutée à l'écran d'accueil).
 
-**▶ Jouer : https://bertrandg.github.io/game-cards/** (une fois GitHub Pages activé, voir plus bas)
+**▶ Jouer : https://bertrandg.github.io/Game-cards/**
 
 ## Ce que fait l'application
 
