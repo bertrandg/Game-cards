@@ -1,0 +1,77 @@
+/* Jeu de 52 cartes classique : papier crème, encres terre cuite et brun chaud */
+
+.pc {
+  --cw: 72px;
+  --red: #c8553d;
+  --black: #3d3430;
+  position: relative; flex: none;
+  width: var(--cw); height: calc(var(--cw) * 1.4);
+  border-radius: calc(var(--cw) * .1);
+  font-size: calc(var(--cw) * .14);
+  transform-style: preserve-3d;
+  line-height: 1;
+}
+.pc.flying { z-index: 90; }
+.pc .face {
+  position: absolute; inset: 0; border-radius: inherit; overflow: hidden;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+}
+.pc .front {
+  background:
+    radial-gradient(ellipse at 30% 0%, rgba(255, 255, 255, .9), transparent 60%),
+    #fffaf2;
+  box-shadow: 0 2px 6px rgba(90, 60, 30, .25), inset 0 0 0 1px rgba(90, 60, 30, .12);
+  color: var(--black);
+}
+.pc.red .front { color: var(--red); }
+.pc .back {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 246, 232, .9) 0 9%, transparent 9.5%),
+    repeating-linear-gradient(45deg, rgba(255, 246, 232, .22) 0 2px, transparent 2px 7px),
+    repeating-linear-gradient(-45deg, rgba(255, 246, 232, .22) 0 2px, transparent 2px 7px),
+    linear-gradient(160deg, #4f9e92, #2f7268);
+  border: calc(var(--cw) * .05) solid #fffaf2;
+  box-shadow: 0 2px 6px rgba(90, 60, 30, .25);
+  transform: rotateY(180deg);
+}
+.pc.down .back { transform: none; }
+
+.pc-corner {
+  position: absolute; top: 5%; left: 6%;
+  display: flex; flex-direction: column; align-items: center;
+  font-family: var(--title); font-weight: 700; font-size: 1.15em; letter-spacing: -.04em;
+}
+.pc-corner small { font-size: .85em; margin-top: .05em; }
+.pc-corner.bottom { top: auto; left: auto; bottom: 5%; right: 6%; rotate: 180deg; }
+
+.pc-pips {
+  position: absolute; inset: 15% 22%;
+  display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(7, 1fr);
+  place-items: center; font-size: 1.25em;
+}
+.pc-pips i { font-style: normal; }
+.pc-pips i.down { rotate: 180deg; }
+.pc-ace { position: absolute; inset: 0; display: grid; place-items: center; font-size: 3.4em; }
+.pc-face {
+  position: absolute; inset: 17% 18%; border-radius: .5em;
+  display: grid; place-items: center; font-size: 2.6em;
+  background: linear-gradient(160deg, #fbe7cf, #f3d3ad);
+  box-shadow: inset 0 0 0 .06em currentColor;
+}
+.pc.red .pc-face { background: linear-gradient(160deg, #fde3d8, #f7c8b6); }
+.pc-face b { position: absolute; bottom: .08em; right: .12em; font-size: .38em; }
+
+/* étiquette des cartes spéciales */
+.pc-tag {
+  position: absolute; left: 50%; bottom: 4%; translate: -50% 0;
+  background: var(--gold, #f2b84b); color: #5a3d06; border-radius: 999px;
+  font-size: .62em; font-weight: 800; padding: .15em .45em; white-space: nowrap;
+}
+
+/* tailles */
+.pc.mini { --cw: 34px; }
+.pc.tiny { --cw: 18px; }
+.pc.mini .pc-corner.bottom, .pc.mini .pc-tag, .pc.tiny .pc-corner, .pc.tiny .pc-tag { display: none; }
+.pc.mini .pc-pips, .pc.mini .pc-face { display: none; }
+.pc.mini .pc-corner { position: absolute; inset: 0; justify-content: center; font-size: 1.9em; }
+.pc.mini .pc-ace { font-size: 0; }

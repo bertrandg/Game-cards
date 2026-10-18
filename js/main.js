@@ -256,7 +256,7 @@ async function play(saveId) {
   const g = gameById(save.gameId);
   app.onclick = app.onsubmit = null;
   app.innerHTML = `<div class="loading">${esc(g.loading || 'Mélange des cartes…')}</div>`;
-  const [mod] = await Promise.all([g.load().then((m) => m.default), loadCSS(g.css)]);
+  const [mod] = await Promise.all([g.load().then((m) => m.default), ...[].concat(g.css).map(loadCSS)]);
   if (location.hash !== `#/play/${saveId}`) return; // on a quitté pendant le chargement
   let finished = false;
   const host = {

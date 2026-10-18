@@ -1,6 +1,7 @@
 // Registre des jeux. Chaque jeu n'est téléchargé qu'au moment où on le lance.
 // Pour ajouter un jeu : créer js/games/<id>/index.js (voir seasalt) et l'inscrire ici.
 // `solo` (facultatif) : texte affiché quand le jeu se joue aussi seul contre l'ordinateur.
+// `css` : une feuille de style, ou une liste (par exemple le jeu de 52 cartes commun + celle du jeu).
 export const GAMES = [
   {
     id: 'seasalt',
@@ -25,6 +26,18 @@ export const GAMES = [
     css: 'css/naval.css',
     loading: 'Les navires prennent la mer…',
     load: () => import('./naval/index.js'),
+  },
+  {
+    id: 'eights',
+    name: 'Huit américain',
+    tagline: 'Même couleur ou même valeur… et le 8 change tout ! À plusieurs, ou seul contre deux robots.',
+    players: [1, 5],
+    solo: 'Seul, vous affrontez deux robots.',
+    duration: '20 min',
+    emoji: '🃏',
+    tint: ['#f4b1c4', '#3d9a8b'],
+    css: ['css/deck.css', 'css/eights.css'],
+    load: () => import('./eights/index.js'),
   },
 ];
 
