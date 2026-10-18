@@ -1,0 +1,11 @@
+{
+  "name": "Petite Partie",
+  "short_name": "Petite Partie",
+  "description": "Jeux de cartes à partager sur un seul téléphone.",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f6ead8",
+  "theme_color": "#f6ead8",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
