@@ -73,5 +73,5 @@
 .pc.tiny { --cw: 18px; }
 .pc.mini .pc-corner.bottom, .pc.mini .pc-tag, .pc.tiny .pc-corner, .pc.tiny .pc-tag { display: none; }
 .pc.mini .pc-pips, .pc.mini .pc-face { display: none; }
-.pc.mini .pc-corner { position: absolute; inset: 0; justify-content: center; font-size: 1.9em; }
+.pc.mini .pc-corner { position: absolute; inset: 0; justify-content: center; font-size: 2.6em; }
 .pc.mini .pc-ace { font-size: 0; }
