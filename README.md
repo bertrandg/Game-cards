@@ -49,6 +49,8 @@ Le workflow `.github/workflows/pages.yml` publie le site à chaque push sur `mai
 - `js/storage.js` : joueurs, sauvegardes et historique dans le navigateur
 - `js/ui/anim.js` : animations des cartes (technique FLIP + retournement 3D) et confettis
 - `js/ui/dialog.js` : confirmations, saisie, messages
+- `js/ui/sound.js` : bruitages des cartes générés en WebAudio (coupables depuis le menu du jeu)
+- `js/ui/fullscreen.js` : bouton plein écran (masqué sur iPhone, où Safari ne le permet pas)
 - `js/games/index.js` : registre des jeux
 - `js/games/seasalt/` : Sea Salt & Paper — `cards.js` (les 58 cartes), `rules.js` (moteur de règles sans interface), `view.js` (table de jeu) ; styles dans `css/seasalt.css`
 

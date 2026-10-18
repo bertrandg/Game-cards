@@ -3,6 +3,7 @@
 import { GAMES, gameById } from './games/index.js';
 import * as store from './storage.js';
 import { confirmDialog, promptDialog, toast, esc } from './ui/dialog.js';
+import { fullscreenButton } from './ui/fullscreen.js';
 
 const app = document.getElementById('app');
 // version ajoutée au déploiement (?v=…) : on la propage aux feuilles de style chargées à la demande
@@ -43,6 +44,7 @@ function home() {
   const players = store.getPlayers();
   app.innerHTML = `
   <div class="screen home">
+    <div class="home-tools">${fullscreenButton()}</div>
     <header class="hero">
       <div class="hero-cards" aria-hidden="true"><span>🐚</span><span>🦀</span><span>⛵</span></div>
       <h1>Petite Partie</h1>

@@ -4,6 +4,8 @@ import { CARDS, TYPES, COLORS, sortCards, cardLabel } from './cards.js';
 import * as R from './rules.js';
 import { snapshot, animateCards, bump, confetti } from '../../ui/anim.js';
 import { confirmDialog, toast, esc } from '../../ui/dialog.js';
+import { cardSound, soundOn, setSound } from '../../ui/sound.js';
+import { fullscreenButton } from '../../ui/fullscreen.js';
 
 const LIGHTHOUSE = `<svg viewBox="0 0 40 60" class="svg-art" aria-hidden="true">
   <rect x="9" y="53" width="22" height="5" rx="2" fill="#6f5b4b"/>
@@ -100,9 +102,9 @@ export function mount(root, s, host) {
 
   function top() {
     return `<header class="top">
-      <button class="icon-btn" data-a="menu" aria-label="Menu">☰</button>
+      <div class="top-side"><button class="icon-btn" data-a="menu" aria-label="Menu">☰</button></div>
       <div class="top-mid"><b>Manche ${s.round}</b><small>Objectif ${s.target} points</small></div>
-      <button class="icon-btn" data-a="rules" aria-label="Règles">?</button>
+      <div class="top-side end">${fullscreenButton()}<button class="icon-btn" data-a="rules" aria-label="Règles">?</button></div>
     </header>`;
   }
 
@@ -342,6 +344,7 @@ export function mount(root, s, host) {
         <div class="sheet-foot col">
           <button class="btn primary" data-a="close">Reprendre</button>
           <button class="btn" data-a="rules">Règles du jeu</button>
+          <button class="btn" data-a="sound">${soundOn() ? '🔊 Son activé' : '🔇 Son coupé'}</button>
           <button class="btn" data-a="exit">Retour au menu <small>(partie sauvegardée)</small></button>
           <button class="btn danger" data-a="abandon">Abandonner la partie</button>
         </div>
@@ -410,8 +413,15 @@ export function mount(root, s, host) {
     after?.(res);
     // la fin de manche s'affiche avec sa propre distribution des cartes (voir .deal)
     render({ noAnim: s.phase === 'roundEnd' || s.phase === 'gameEnd' });
+    if (s.phase === 'roundEnd' || s.phase === 'gameEnd') dealSounds();
     if (s.phase === 'roundEnd' || s.phase === 'gameEnd') el.querySelectorAll('.gain').forEach((g, k) => setTimeout(() => bump(g), 500 + k * 150));
     return res;
+  }
+
+  // les cartes révélées en fin de manche arrivent une à une (animation .deal)
+  function dealSounds() {
+    const n = Math.min(el.querySelectorAll('.deal').length, 8);
+    for (let k = 0; k < n; k++) cardSound({ delay: k * 90, flip: true });
   }
 
   const markFresh = (...ids) => { ui.fresh = new Set(ids.filter((x) => x != null)); };
@@ -421,6 +431,7 @@ export function mount(root, s, host) {
       case 'menu': ui.overlay = 'menu'; return render({ noAnim: true });
       case 'rules': ui.overlay = 'rules'; return render({ noAnim: true });
       case 'close': ui.overlay = null; return render({ noAnim: true });
+      case 'sound': setSound(!soundOn()); return render({ noAnim: true });
       case 'exit': return host.exit();
       case 'abandon':
         if (await confirmDialog('Abandonner cette partie ? Elle sera supprimée.', { ok: 'Abandonner', danger: true })) {
@@ -512,6 +523,7 @@ export function mount(root, s, host) {
       if (inHand && s.phase === 'play') {
         if (ui.sel.includes(id)) ui.sel = ui.sel.filter((x) => x !== id);
         else ui.sel = [...ui.sel, id].slice(-2);
+        cardSound();
         return render();
       }
       ui.zoom = id;

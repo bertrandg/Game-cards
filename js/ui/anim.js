@@ -2,7 +2,10 @@
 // puis on fait glisser chaque carte de son ancienne place vers la nouvelle.
 // Une carte qui apparaît vient d'une origine (la pioche par défaut) en se retournant.
 
+import { cardSound } from './sound.js';
+
 const EASE = 'cubic-bezier(.22,.9,.25,1)';
+const MAX_SOUNDS = 8; // au-delà, une avalanche de sons devient du bruit
 
 function center(el) {
   const r = el.getBoundingClientRect();
@@ -25,8 +28,9 @@ const reduced = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').ma
  * fallback : sélecteur de l'élément d'où partent les autres nouvelles cartes (null : apparition en fondu)
  */
 export function animateCards(root, before, { origins = {}, fallback = null, stagger = 70 } = {}) {
-  if (reduced()) return;
   let k = 0;
+  let sounds = 0;
+  const motion = !reduced();
   root.querySelectorAll('[data-cid]').forEach((el) => {
     const id = el.dataset.cid;
     let from = before.get(id);
@@ -36,6 +40,7 @@ export function animateCards(root, before, { origins = {}, fallback = null, stag
       const sel = o ? o.sel : fallback;
       const src = sel && root.querySelector(sel);
       if (!src) {
+        if (!motion) return;
         el.animate([{ opacity: 0, transform: 'scale(.85)' }, { opacity: 1, transform: 'scale(1)' }],
           { duration: 300, easing: EASE, delay: k++ * stagger, fill: 'backwards' });
         return;
@@ -50,6 +55,9 @@ export function animateCards(root, before, { origins = {}, fallback = null, stag
     if (!flip && Math.abs(dx) < 1 && Math.abs(dy) < 1 && Math.abs(s - 1) < 0.02) return;
     const delay = flip ? k++ * stagger : 0;
     const dist = Math.hypot(dx, dy);
+    // un léger décalage de mise en page n'est pas un mouvement de carte : pas de son
+    if ((flip || dist > 24) && sounds++ < MAX_SOUNDS) cardSound({ delay, flip });
+    if (!motion) return;
     el.classList.add('flying');
     const a = el.animate([
       { transform: `perspective(900px) translate(${dx}px, ${dy}px) scale(${s}) rotateY(${flip ? 180 : 0}deg)` },

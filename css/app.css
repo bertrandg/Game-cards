@@ -98,6 +98,8 @@ h1, h2, h3 { font-family: var(--title); font-weight: 600; margin: 0; }
 .avatar.big { width: 44px; height: 44px; font-size: 1.3rem; }
 
 /* ---------- accueil ---------- */
+.home { position: relative; }
+.home-tools { position: absolute; top: calc(14px + var(--safe-t)); right: 16px; z-index: 1; }
 .hero { text-align: center; padding: 18px 0 4px; }
 .hero h1 { font-size: 2.3rem; color: var(--ink); letter-spacing: .5px; }
 .hero p { margin: 6px 0 0; color: var(--muted); }
