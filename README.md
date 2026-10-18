@@ -11,12 +11,14 @@ Application web pensée pour le navigateur mobile, sans installation (elle peut 
     <th>Sea Salt &amp; Paper</th>
     <th>Bataille navale</th>
     <th>Huit américain</th>
+    <th>Président</th>
   </tr>
   <tr>
     <td><img src="docs/home.png" width="250" alt="Accueil : parties en cours et choix du jeu"></td>
     <td><img src="docs/seasalt.png" width="250" alt="Sea Salt &amp; Paper : pioche, défausses et main du joueur"></td>
     <td><img src="docs/naval.png" width="250" alt="Bataille navale : grille adverse, tir visé et flotte du joueur"></td>
     <td><img src="docs/eights.png" width="250" alt="Huit américain : pioche, défausse et main du joueur avec les cartes jouables en surbrillance"></td>
+    <td><img src="docs/president.png" width="250" alt="Président : pli en cours sur la table et paire d'as sélectionnée dans la main"></td>
   </tr>
 </table>
 

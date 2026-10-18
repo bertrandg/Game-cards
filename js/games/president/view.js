@@ -94,7 +94,7 @@ export function mount(root, s, host) {
     else {
       const who = esc(P(t.by).name);
       info = `<b>${who}</b> : ${R.playLabel(t.cards)}`;
-      if (s.trick.match != null) info += ` <span class="pr-match">${R.valueName(t.cards[0])} ou rien !</span>`;
+      if (s.trick.match != null) info += ` — <span class="pr-match">${R.valueName(t.cards[0])} ou rien !</span>`;
     }
     return `<section class="pr-table" data-anchor="table">
       ${prev ? group(prev, 'prev') : ''}
