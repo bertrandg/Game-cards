@@ -307,10 +307,12 @@ export function mount(root, s, host) {
     if (!alive || !playing() || ui.busy) return;
     if (P(s.current).cpu) return robots();
     if (s.current !== ui.viewer) {
-      ui.busy = true;
-      await wait(900); // laisser voir le coup avant de cacher la main
-      ui.busy = false;
-      if (!alive) return;
+      if (ui.viewer !== null) {
+        ui.busy = true;
+        await wait(900); // laisser voir le coup avant de cacher la main
+        ui.busy = false;
+        if (!alive || s.current === ui.viewer) return;
+      }
       ui.viewer = null;
       render({ noAnim: true });
     }
