@@ -1,14 +1,14 @@
 // Bataille navale : moteur de règles pur, état sérialisable en JSON.
-// Grille de 10 × 10 ; cases numérotées 0…99 (ligne × 10 + colonne). Les navires ne se touchent pas,
-// même en diagonale : quand un navire coule, les cases autour sont donc forcément de l'eau.
+// Règles classiques (« Touché Coulé ») : grille de 10 × 10, cases numérotées 0…99 (ligne × 10 + colonne),
+// 5 navires droits qui peuvent se toucher mais pas se chevaucher. Variante maison : touché = on rejoue.
 
 export const N = 10;
 export const COLS = 'ABCDEFGHIJ';
 
 export const FLEET = [
   { name: 'Porte-avions', size: 5 },
-  { name: 'Croiseur', size: 4 },
-  { name: 'Contre-torpilleur', size: 3 },
+  { name: 'Cuirassé', size: 4 },
+  { name: 'Croiseur', size: 3 },
   { name: 'Sous-marin', size: 3 },
   { name: 'Torpilleur', size: 2 },
 ];
@@ -17,7 +17,6 @@ export const FLEET = [
 export const UNKNOWN = 0;
 export const MISS = 1;
 export const HIT = 2;
-export const WATER = 3; // eau déduite autour d'un navire coulé (pas un tir)
 
 export const cellName = (i) => `${COLS[i % N]}${Math.floor(i / N) + 1}`;
 
@@ -32,28 +31,13 @@ const inside = (ship) => {
   return ship.r >= 0 && ship.c >= 0 && (ship.h ? ship.c + size <= N && ship.r < N : ship.r + size <= N && ship.c < N);
 };
 
-function neighbors(i, diag = true) {
-  const r = Math.floor(i / N);
-  const c = i % N;
-  const out = [];
-  for (let dr = -1; dr <= 1; dr++) {
-    for (let dc = -1; dc <= 1; dc++) {
-      if ((!dr && !dc) || (!diag && dr && dc)) continue;
-      const rr = r + dr;
-      const cc = c + dc;
-      if (rr >= 0 && rr < N && cc >= 0 && cc < N) out.push(rr * N + cc);
-    }
-  }
-  return out;
-}
-
 // le navire `ship` peut-il être placé parmi les autres navires de `fleet` (sauf celui d'index `skip`) ?
 export function fits(fleet, ship, skip = -1) {
   if (!inside(ship)) return false;
   const taken = new Set();
   fleet.forEach((o, j) => {
     if (j === skip || !o) return;
-    for (const i of shipCells(o)) { taken.add(i); neighbors(i).forEach((x) => taken.add(x)); }
+    for (const i of shipCells(o)) taken.add(i);
   });
   return shipCells(ship).every((i) => !taken.has(i));
 }
@@ -126,7 +110,7 @@ export const opponent = (i) => 1 - i;
 
 export function placeFleet(s, i, fleet) {
   if (s.phase !== 'place' || s.placer !== i) throw new Error('Ce n\'est pas le moment de placer cette flotte');
-  if (!validFleet(fleet)) throw new Error('Les navires ne doivent pas se toucher');
+  if (!validFleet(fleet)) throw new Error('Les navires ne peuvent pas se chevaucher');
   s.fleets[i] = fleet.map(({ k, r, c, h }) => ({ k, r, c, h }));
   s.placer = s.fleets.findIndex((f) => !f);
   if (s.placer < 0) s.phase = 'battle';
@@ -145,31 +129,26 @@ export function fire(s, idx) {
   const opp = opponent(by);
   const board = s.shots[by];
   if (board[idx] === MISS || board[idx] === HIT) throw new Error('Vous avez déjà tiré ici');
-  if (board[idx] === WATER) throw new Error('Il n\'y a que de l\'eau ici');
   const k = shipAt(s.fleets[opp], idx);
   const hit = k >= 0;
   board[idx] = hit ? HIT : MISS;
   s.fired[by]++;
   let sunk = null;
-  const around = [];
   if (hit) {
     s.hits[by]++;
-    const cells = shipCells(s.fleets[opp][k]);
-    if (cells.every((x) => board[x] === HIT)) {
-      sunk = k;
-      for (const x of cells) {
-        for (const y of neighbors(x)) if (board[y] === UNKNOWN) { board[y] = WATER; around.push(y); }
-      }
-    }
+    if (shipCells(s.fleets[opp][k]).every((x) => board[x] === HIT)) sunk = k;
   }
   s.last = { by, idx, hit, sunk };
+  // tous les tirs du tour en cours (on rejoue tant qu'on touche), pour les montrer à l'adversaire
+  if (s.volley?.by !== by) s.volley = { by, shots: [] };
+  s.volley.shots.push({ idx, hit, sunk });
   const win = sunk !== null && sunkShips(s, opp).length === FLEET.length;
   if (win) {
     s.phase = 'end';
     s.winner = by;
-  } else {
+  } else if (!hit) {
     s.current = opp;
     if (by !== s.first) s.turn++;
   }
-  return { idx, hit, sunk, around, win };
+  return { idx, hit, sunk, win, again: hit && !win };
 }

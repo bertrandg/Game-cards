@@ -43,11 +43,14 @@ Les règles résumées et le détail des cartes sont accessibles en jeu avec le 
 
 ### Bataille navale (1 ou 2 joueurs)
 
-- grille de 10 × 10, flotte classique : porte-avions (5), croiseur (4), contre-torpilleur (3), sous-marin (3), torpilleur (2) ;
-- les navires ne se touchent pas (même en diagonale) : autour d'un navire coulé, l'eau est marquée automatiquement ;
+Règles classiques du « Touché Coulé », avec une variante maison :
+- grille de 10 × 10 (colonnes A à J, lignes 1 à 10) et 5 navires droits : porte-avions (5), cuirassé (4), croiseur (3), sous-marin (3), torpilleur (2) ;
+- les navires peuvent se toucher, mais pas se chevaucher ;
+- on annonce « dans l'eau », « touché » ou « touché-coulé » en nommant le navire coulé ; le premier qui coule les 5 navires adverses gagne ;
+- **variante : touché = on rejoue**, jusqu'à tomber dans l'eau ;
 - placement par glisser-déposer, bouton « Tourner » et placement au hasard ;
 - on vise une case puis on tire (deuxième appui ou bouton « Feu ») : boulet, plouf ou explosion, navire qui sombre ;
-- à deux, on se passe le téléphone après chaque tir (le joueur suivant revoit le tir reçu sur sa flotte) ;
+- à deux, on se passe le téléphone quand un tir tombe dans l'eau ; le joueur suivant voit la liste des tirs reçus et les revoit sur sa flotte ;
 - seul, on affronte l'**Amiral Robot**, qui traque les navires touchés et estime où se cachent les autres.
 
 ## Lancer en local

@@ -7,7 +7,7 @@ import { confirmDialog, toast, esc } from '../../ui/dialog.js';
 import { soundOn, setSound, shotSound, splashSound, boomSound, tickSound } from '../../ui/sound.js';
 import { fullscreenButton } from '../../ui/fullscreen.js';
 
-const { N, COLS, FLEET, MISS, HIT, WATER } = R;
+const { N, COLS, FLEET } = R;
 const avatar = (p) => `<span class="avatar" style="--pc:${p.color || '#c98a4b'}">${p.cpu ? '🤖' : esc(p.name.slice(0, 1).toUpperCase())}</span>`;
 // « de Bob », « d'Alice »
 const de = (name) => (/^[aeiouyhàâéèêëîïôûü]/i.test(name) ? `d'${name}` : `de ${name}`);
@@ -26,8 +26,8 @@ export function mount(root, s, host) {
     drag: null,
     aim: null, // case visée, avant de tirer
     busy: false, // effet en cours ou tour de l'ordinateur
-    hide: null, // { board, idx, around } : résultat pas encore montré (l'effet est en route)
-    fresh: null, // { board, idx, sunk, around } : résultat qui vient d'apparaître
+    hide: null, // { board, cells } : résultats pas encore montrés (l'effet est en route)
+    fresh: null, // { board, idx, sunk } : résultat qui vient d'apparaître
     overlay: null, // menu | rules
     endClosed: false,
     finished: false,
@@ -81,22 +81,19 @@ export function mount(root, s, host) {
     const sunk = kind === 'place' ? [] : R.sunkShips(s, owner);
     const hide = ui.hide?.board === kind ? ui.hide : null;
     const fresh = ui.fresh?.board === kind ? ui.fresh : null;
-    const freshAround = fresh ? fresh.around || [] : [];
     const live = kind === 'enemy' && canFire();
     let cells = '';
     for (let i = 0; i < N * N; i++) {
       let v = seen ? seen[i] : 0;
-      if (hide && (hide.idx === i || hide.around?.includes(i))) v = 0;
+      if (hide?.cells.includes(i)) v = 0;
       const cls = [`v${v}`];
       if (fresh && (fresh.idx === i)) cls.push('new');
-      const d = freshAround.indexOf(i);
-      if (d >= 0) cls.push('new');
       if (ui.aim === i && kind === 'enemy') cls.push('aim');
       if (live && !v) cls.push('open');
-      cells += `<button class="cell ${cls.join(' ')}" data-cell="${i}" data-k="${kind}" ${d >= 0 ? `style="--d:${200 + d * 35}ms"` : ''} aria-label="${R.cellName(i)}"></button>`;
+      cells += `<button class="cell ${cls.join(' ')}" data-cell="${i}" data-k="${kind}" aria-label="${R.cellName(i)}"></button>`;
     }
     const ships = fleet.map((sh, k) => {
-      const isSunk = sunk.includes(k) && !(hide && R.shipCells(sh).includes(hide.idx));
+      const isSunk = sunk.includes(k) && !(hide && R.shipCells(sh).some((x) => hide.cells.includes(x)));
       if (kind === 'enemy' && !isSunk && s.phase !== 'end') return '';
       const cls = ['ship', sh.h ? 'h' : 'v'];
       if (isSunk) cls.push('sunk');
@@ -126,7 +123,7 @@ export function mount(root, s, host) {
     const k = ui.selShip;
     return `<section class="place">
       <h2>${avatar(P(s.placer))} Placez votre flotte</h2>
-      <p class="muted">Faites glisser un navire pour le déplacer. Touchez-le puis « Tourner » pour changer son sens. Les navires ne doivent pas se toucher.</p>
+      <p class="muted">Faites glisser un navire pour le déplacer. Touchez-le puis « Tourner » pour changer son sens. Les navires peuvent se toucher, mais pas se chevaucher.</p>
       ${board('place', s.placer, big)}
       <ul class="dock">${FLEET.map((f, j) => `<li><button class="${k === j ? 'on' : ''}" data-pick="${j}"><span class="segs">${'<i></i>'.repeat(f.size)}</span>${f.name}</button></li>`).join('')}</ul>
       <div class="bn-actions">
@@ -141,7 +138,7 @@ export function mount(root, s, host) {
     let target = ship;
     if (!R.fits(ui.draft, target, k)) {
       target = snap ? R.nearestFit(ui.draft, ship, k) : null;
-      if (!target) { toast('Pas de place ici : les navires ne doivent pas se toucher'); return false; }
+      if (!target) { toast('Pas de place ici : les navires ne peuvent pas se chevaucher'); return false; }
     }
     ui.draft[k] = target;
     tickSound({ pitch: 0.8 });
@@ -192,7 +189,7 @@ export function mount(root, s, host) {
     if (!d) return;
     ui.drag = null;
     if (d.moved && d.pos) {
-      if (R.fits(ui.draft, d.pos, d.k)) { ui.draft[d.k] = d.pos; tickSound({ pitch: 0.8 }); } else toast('Les navires ne doivent pas se toucher');
+      if (R.fits(ui.draft, d.pos, d.k)) { ui.draft[d.k] = d.pos; tickSound({ pitch: 0.8 }); } else toast('Les navires ne peuvent pas se chevaucher');
     }
     ui.selShip = d.k;
     render();
@@ -235,6 +232,7 @@ export function mount(root, s, host) {
     const l = s.last;
     if (s.current !== me && l?.by === me) return `${lastText(l, true)}`;
     if (ui.aim != null) return `<span>Cible <b>${R.cellName(ui.aim)}</b> : touchez à nouveau ou appuyez sur Feu.</span>`;
+    if (l?.by === me && l.hit) return `<span class="again">${lastText(l, true)}</span><span>Vous avez touché : rejouez !</span>`;
     const before = l && l.by !== me ? `<span class="recv">${esc(P(l.by).name)} : ${lastText(l, false)}</span>` : '';
     return `${before}<span>À vous ! Touchez une case de la grille adverse.</span>`;
   }
@@ -266,8 +264,10 @@ export function mount(root, s, host) {
     if (s.phase === 'place') {
       news = '<p>Placez votre flotte en secret : l\'autre joueur ne doit pas regarder !</p>';
       btn = 'C\'est moi, placer ma flotte';
-    } else if (s.last && s.last.by !== i) {
-      news = `<div class="news"><b>Pendant ce temps…</b><ul><li class="${s.last.hit ? 'secret' : ''}">${esc(P(s.last.by).name)} a tiré : ${esc(lastText(s.last, false))}</li></ul></div>`;
+    } else if (s.volley && s.volley.by !== i) {
+      const shots = s.volley.shots.map((x) => `<li class="${x.hit ? 'secret' : ''}">${esc(lastText(x, false))}</li>`).join('');
+      const n = s.volley.shots.length;
+      news = `<div class="news"><b>${esc(P(s.volley.by).name)} a tiré ${n > 1 ? `${n} fois` : 'une fois'} :</b><ul>${shots}</ul></div>`;
     }
     return `<div class="overlay handoff">
       <div class="sheet">
@@ -326,14 +326,15 @@ export function mount(root, s, host) {
         <p>Chaque joueur cache sa flotte sur une grille de 10 × 10 cases, puis on tire chacun son tour pour couler les navires adverses. Le premier qui coule toute la flotte d'en face gagne.</p>
         <h3>La flotte</h3>
         <ul class="fleet-rules">${FLEET.map((f) => `<li><span class="segs">${'<i></i>'.repeat(f.size)}</span><b>${f.name}</b> · ${f.size} cases</li>`).join('')}</ul>
-        <p>Les navires sont droits (horizontaux ou verticaux) et <b>ne se touchent pas</b>, même par un coin.</p>
+        <p>Les navires sont droits (horizontaux ou verticaux). Ils <b>peuvent se toucher</b>, mais pas se chevaucher.</p>
         <h3>À votre tour</h3>
         <ol>
           <li>Touchez une case de la grille adverse pour viser, puis touchez-la encore (ou « Feu ») pour tirer.</li>
           <li><b>Dans l'eau</b> 💦, <b>touché</b> 💥 ou <b>coulé</b> quand toutes les cases d'un navire sont touchées.</li>
-          <li>Autour d'un navire coulé, les cases sont forcément de l'eau : elles sont marquées pour vous.</li>
+          <li><b>Touché ? Vous rejouez</b>, jusqu'à tomber dans l'eau.</li>
+          <li>Quand un navire coule, son nom est annoncé à l'adversaire.</li>
         </ol>
-        <p>Un tir par tour, touché ou non. À deux, on se passe le téléphone ; seul, on affronte l'Amiral Robot.</p>
+        <p>Le premier qui coule les 5 navires adverses gagne. À deux, on se passe le téléphone quand un tir tombe à l'eau ; seul, on affronte l'Amiral Robot.</p>
         <p>En bas, votre propre flotte montre les tirs reçus.</p>
       </div>
     </div>`;
@@ -411,12 +412,12 @@ export function mount(root, s, host) {
     host.save(s);
     ui.aim = null;
     ui.busy = true;
-    ui.hide = { board: kind, idx, around: res.around };
+    ui.hide = { board: kind, cells: [idx] };
     render();
     await shotFx(kind, idx, res);
     if (!alive) return res;
     ui.hide = null;
-    ui.fresh = { board: kind, idx, sunk: res.sunk, around: res.around };
+    ui.fresh = { board: kind, idx, sunk: res.sunk };
     render();
     if (res.sunk !== null) {
       const name = FLEET[res.sunk].name.toLowerCase();
@@ -429,6 +430,7 @@ export function mount(root, s, host) {
     }
     ui.busy = false;
     render();
+    if (res.again && kind === 'enemy') toast('💥 Touché : vous rejouez !', 1600);
     return res;
   }
 
@@ -439,20 +441,28 @@ export function mount(root, s, host) {
     await wait(650 + Math.random() * 450);
     if (!alive) return;
     await shoot(cpuTarget(s));
+    cpuTurn(); // touché : il rejoue
   }
 
-  // à la reprise du tour (à deux), on revoit le tir que l'adversaire vient de faire sur notre flotte
+  // à la reprise du tour (à deux), on revoit les tirs que l'adversaire vient de faire sur notre flotte
   async function replayLast() {
-    const l = s.last;
-    if (!l || l.by === ui.viewer) return render();
+    const v = s.volley;
+    if (!v || v.by === ui.viewer) return render();
     ui.busy = true;
-    ui.hide = { board: 'mine', idx: l.idx, around: [] };
+    const cells = v.shots.map((x) => x.idx);
+    ui.hide = { board: 'mine', cells: [...cells] };
     render();
     await wait(250);
-    await shotFx('mine', l.idx, l);
+    for (const x of v.shots) {
+      await shotFx('mine', x.idx, x);
+      if (!alive) return;
+      ui.hide.cells = ui.hide.cells.filter((i) => i !== x.idx);
+      ui.fresh = { board: 'mine', idx: x.idx, sunk: x.sunk };
+      render();
+      await wait(x.sunk !== null ? 700 : 300);
+    }
     ui.hide = null;
     ui.busy = false;
-    ui.fresh = { board: 'mine', idx: l.idx, sunk: l.sunk, around: [] };
     render();
   }
 
@@ -536,7 +546,7 @@ export function mount(root, s, host) {
     }
     if (kind !== 'enemy' || !canFire()) return;
     const v = s.shots[ui.viewer][i];
-    if (v) { toast(v === WATER ? 'Il n\'y a que de l\'eau ici' : 'Déjà tiré ici'); return; }
+    if (v) { toast('Déjà tiré ici'); return; }
     if (ui.aim === i) {
       await shoot(i);
       if (cpu) cpuTurn();

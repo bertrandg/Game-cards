@@ -133,7 +133,7 @@
   min-height: 3em; padding: 6px 16px; text-align: center; font-size: .9rem; color: #6d5646;
   display: flex; flex-direction: column; justify-content: center; gap: 2px;
 }
-.bn-status .recv { color: var(--accent-dark); font-weight: 800; }
+.bn-status .recv, .bn-status .again { color: var(--accent-dark); font-weight: 800; }
 .mine { display: flex; gap: 14px; align-items: center; justify-content: center; padding: 0 12px; }
 .mine .board { margin: 0; }
 .mine-info { display: grid; gap: 8px; min-width: 0; }

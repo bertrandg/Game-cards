@@ -1,7 +1,7 @@
 // L'Amiral Robot : il compte, pour chaque case, combien de positions des navires restants la recouvrent
 // (en tenant compte des tirs déjà connus) et tire là où c'est le plus probable.
 // Quand il a touché un navire pas encore coulé, il ne garde que les positions qui passent par ce coup.
-import { N, FLEET, MISS, HIT, WATER, shipCells, sunkShips, opponent } from './rules.js';
+import { N, FLEET, MISS, HIT, shipCells, sunkShips, opponent } from './rules.js';
 
 export function cpuTarget(s, rand = Math.random) {
   const me = s.current;
@@ -11,7 +11,7 @@ export function cpuTarget(s, rand = Math.random) {
   const sunkCells = new Set(sunk.flatMap((k) => shipCells(s.fleets[opp][k])));
   const open = new Set(); // coups au but sur des navires encore à flot
   board.forEach((v, i) => { if (v === HIT && !sunkCells.has(i)) open.add(i); });
-  const blocked = (i) => board[i] === MISS || board[i] === WATER || sunkCells.has(i);
+  const blocked = (i) => board[i] === MISS || sunkCells.has(i);
 
   const weight = Array(N * N).fill(0);
   const sizes = FLEET.map((f, k) => (sunk.includes(k) ? 0 : f.size)).filter(Boolean);
