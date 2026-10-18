@@ -10,6 +10,7 @@ import { fullscreenButton } from '../../ui/fullscreen.js';
 
 const avatar = (p) => `<span class="avatar" style="--pc:${p.color || '#c98a4b'}">${p.cpu ? '🤖' : esc(p.name.slice(0, 1).toUpperCase())}</span>`;
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const pts = (n) => `${n} pt${Math.abs(n) > 1 ? 's' : ''}`;
 const roleBadge = (role) => (role ? `<span class="pr-role r-${role}" title="${R.ROLES[role].name}">${R.ROLES[role].icon} ${R.ROLES[role].name}</span>` : '');
 
 export function mount(root, s, host) {
@@ -76,7 +77,7 @@ export function mount(root, s, host) {
       return `<div class="pr-opp ${turn ? 'turn' : ''} ${out ? 'out' : ''}" data-opp="${i}">
         <div class="pr-opp-head">${avatar(P(i))}<b>${esc(P(i).name)}</b></div>
         <div class="pr-opp-hand">${out ? `<span class="pr-out">${out.icon}</span>` : `${pcBackHTML('tiny')}<small>${n}</small>`}</div>
-        <div class="pr-opp-foot">${roleBadge(s.roles[i])}<span class="pr-opp-score">${s.scores[i]} pts</span></div>
+        <div class="pr-opp-foot">${roleBadge(s.roles[i])}<span class="pr-opp-score">${pts(s.scores[i])}</span></div>
         ${passed ? '<span class="pr-bubble">Passe</span>' : ''}
       </div>`;
     }).join('')}</section>`;
@@ -123,7 +124,7 @@ export function mount(root, s, host) {
     const i = me();
     const done = s.finished.indexOf(i);
     const head = `<div class="pr-me-head">${avatar(P(i))}<b>${esc(P(i).name)}</b>${roleBadge(s.roles[i])}
-      <span class="pill">🏆 ${s.scores[i]} pts</span></div>`;
+      <span class="pill">🏆 ${pts(s.scores[i])}</span></div>`;
     const out = done >= 0 && playing() ? `<p class="pr-done">${R.ROLES[R.roleOf(s.players.length, done)].icon} Vous avez fini : ${R.ROLES[R.roleOf(s.players.length, done)].name} !</p>` : '';
     return `<section class="pr-me">${head}<div class="pr-actions">${actions()}</div>${out}${hand()}</section>`;
   }
@@ -204,7 +205,7 @@ export function mount(root, s, host) {
       const left = R.sortHand(s.hands[i]);
       return `<li class="${k === 0 ? 'win' : ''}"><span>${R.ROLES[role].icon}</span>${avatar(P(i))}
         <b>${esc(P(i).name)}<small>${R.ROLES[role].name}${left.length ? ` · restait ${left.length} carte${left.length > 1 ? 's' : ''}` : ''}</small></b>
-        <em><span class="pr-gain">+${r.gains[i]}</span><small>${s.scores[i]} pts</small></em></li>`;
+        <em><span class="pr-gain">+${r.gains[i]}</span><small>${pts(s.scores[i])}</small></em></li>`;
     }).join('');
     const btn = s.phase === 'gameEnd'
       ? '<button class="btn primary big" data-a="final">Voir le classement 🏆</button>'
@@ -229,7 +230,7 @@ export function mount(root, s, host) {
         <div class="trophy">👑</div>
         <h2>${names} ${s.winners.length > 1 ? 'gagnent' : 'gagne'} !</h2>
         <p class="muted">Après ${s.rounds} manches.</p>
-        <ol class="ranking">${order.map((i, k) => `<li class="${s.winners.includes(i) ? 'win' : ''}"><span>${s.winners.includes(i) ? '🥇' : medals[k]}</span>${avatar(P(i))}<b>${esc(P(i).name)}</b><em>${s.scores[i]} pts</em></li>`).join('')}</ol>
+        <ol class="ranking">${order.map((i, k) => `<li class="${s.winners.includes(i) ? 'win' : ''}"><span>${s.winners.includes(i) ? '🥇' : medals[k]}</span>${avatar(P(i))}<b>${esc(P(i).name)}</b><em>${pts(s.scores[i])}</em></li>`).join('')}</ol>
         <div class="sheet-foot col">
           <button class="btn primary big" data-a="again">Rejouer</button>
           <button class="btn ghost" data-a="exit">Retour au menu</button>
