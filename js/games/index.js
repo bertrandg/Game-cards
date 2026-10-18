@@ -42,7 +42,7 @@ export const GAMES = [
   {
     id: 'president',
     name: 'Président',
-    tagline: 'Débarrassez-vous de vos cartes pour devenir Président… et faire payer le Pauvre !',
+    tagline: 'Débarrassez-vous de vos cartes pour devenir Président… et faire payer le Trouduc !',
     players: [1, 6],
     solo: 'Avec moins de 3 joueurs, des robots complètent la table.',
     minTable: 3, // en dessous, des robots complètent

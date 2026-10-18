@@ -71,7 +71,7 @@ Avec un jeu classique de 52 cartes, toutes distribuées :
 - ordre des valeurs : 3 < 4 < … < Roi < As < 2 ;
 - on pose 1 à 4 cartes de même valeur ; les suivants posent le même nombre de cartes, de valeur égale ou supérieure, ou passent ;
 - après une valeur égale, le joueur suivant doit poser cette valeur « ou rien » ; un 2 ferme le pli ;
-- rôles par ordre de sortie : Président, Vice-président, Citoyens, Vice-pauvre, Pauvre ; à la manche suivante, le Pauvre donne ses 2 meilleures cartes au Président qui lui en rend 2 de son choix (1 carte entre les vices) ;
+- rôles par ordre de sortie : Président, Vice-président, Citoyens, Vice-trouduc, Trouduc ; à la manche suivante, le Trouduc donne ses 2 meilleures cartes au Président qui lui en rend 2 de son choix (1 carte entre les vices) ;
 - 5 manches ; à chaque manche, le Président marque autant de points qu'il y a d'autres joueurs, puis un de moins à chaque place ;
 - avec moins de 3 joueurs, des robots complètent la table (jusqu'à 4).
 

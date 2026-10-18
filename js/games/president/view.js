@@ -269,10 +269,10 @@ export function mount(root, s, host) {
           <li>Un <b>2</b> ferme le pli aussitôt. Sinon, quand tout le monde passe, le dernier à avoir posé ouvre le pli suivant.</li>
         </ol>
         <h3>Les rôles</h3>
-        <p>Le premier sans cartes devient ${R.ROLES.president.icon} <b>Président</b>, puis ${R.ROLES.vice.icon} Vice-président, les ${R.ROLES.citizen.icon} Citoyens, ${R.ROLES.vicepoor.icon} Vice-pauvre et le dernier ${R.ROLES.poor.icon} <b>Pauvre</b> (les vices à partir de 4 joueurs).</p>
-        <p>À la manche suivante, le Pauvre donne ses <b>2 meilleures cartes</b> au Président, qui lui rend 2 cartes de son choix ; le Vice-pauvre donne sa meilleure carte au Vice-président, qui lui en rend une. Le Pauvre ouvre la manche. À la première manche, c'est la dame de cœur qui commence.</p>
+        <p>Le premier sans cartes devient ${R.ROLES.president.icon} <b>Président</b>, puis ${R.ROLES.vice.icon} Vice-président, les ${R.ROLES.citizen.icon} Citoyens, ${R.ROLES.vicepoor.icon} Vice-trouduc et le dernier ${R.ROLES.poor.icon} <b>Trouduc</b> (les vices à partir de 4 joueurs).</p>
+        <p>À la manche suivante, le Trouduc donne ses <b>2 meilleures cartes</b> au Président, qui lui rend 2 cartes de son choix ; le Vice-trouduc donne sa meilleure carte au Vice-président, qui lui en rend une. Le Trouduc ouvre la manche. À la première manche, c'est la dame de cœur qui commence.</p>
         <h3>Points</h3>
-        <p>À chaque manche, le Président marque autant de points qu'il y a d'autres joueurs, puis un de moins à chaque place (0 pour le Pauvre). Après ${s.rounds} manches, le plus gros score gagne.</p>
+        <p>À chaque manche, le Président marque autant de points qu'il y a d'autres joueurs, puis un de moins à chaque place (0 pour le Trouduc). Après ${s.rounds} manches, le plus gros score gagne.</p>
         <p class="muted">Avec moins de 3 joueurs, des robots complètent la table.</p>
       </div>
     </div>`;

@@ -3,8 +3,8 @@
 // On pose 1 à 4 cartes de même valeur ; les suivants posent le même nombre de cartes, de valeur égale
 // ou supérieure, ou passent. Après une valeur égale, le joueur suivant doit la poser lui aussi « ou rien ».
 // Un 2 ferme le pli. Quand tout le monde a passé, le dernier à avoir posé ouvre le pli suivant.
-// Ordre de sortie : Président, Vice-président, Citoyens, Vice-pauvre, Pauvre. À la manche suivante,
-// le Pauvre donne ses 2 meilleures cartes au Président qui lui en rend 2 de son choix (1 carte entre vices).
+// Ordre de sortie : Président, Vice-président, Citoyens, Vice-trouduc, Trouduc. À la manche suivante,
+// le Trouduc donne ses 2 meilleures cartes au Président qui lui en rend 2 de son choix (1 carte entre vices).
 import { newDeck, rankOf, suitOf, RANK_NAMES } from '../../cards/deck.js';
 
 export const ROUNDS = 5;
@@ -41,8 +41,8 @@ export const ROLES = {
   president: { name: 'Président', icon: '👑' },
   vice: { name: 'Vice-président', icon: '🎩' },
   citizen: { name: 'Citoyen', icon: '🙂' },
-  vicepoor: { name: 'Vice-pauvre', icon: '🥺' },
-  poor: { name: 'Pauvre', icon: '🪣' },
+  vicepoor: { name: 'Vice-trouduc', icon: '🥺' },
+  poor: { name: 'Trouduc', icon: '🪣' },
 };
 
 export function newGame(players, rand = Math.random) {
@@ -93,7 +93,7 @@ export function startRound(s, rand = Math.random) {
   log(s, null, `Manche ${s.round} sur ${s.rounds}.`);
   const who = (role) => s.roles.indexOf(role);
   if (who('president') >= 0) {
-    // les plus pauvres donnent d'office leurs meilleures cartes
+    // les derniers donnent d'office leurs meilleures cartes
     const give = (from, to, count) => {
       const best = sortHand(s.hands[from]).slice(-count);
       s.hands[from] = s.hands[from].filter((x) => !best.includes(x));
@@ -128,7 +128,7 @@ export function giveBack(s, ids) {
   } else {
     s.phase = 'play';
     s.current = s.roles.indexOf('poor');
-    log(s, null, `${name(s, s.current)} (Pauvre) ouvre la manche.`);
+    log(s, null, `${name(s, s.current)} (Trouduc) ouvre la manche.`);
   }
 }
 
@@ -213,7 +213,7 @@ function endRound(s) {
   const gains = s.players.map((_, j) => n - 1 - s.finished.indexOf(j));
   s.scores = s.scores.map((v, j) => v + gains[j]);
   s.result = { order: [...s.finished], gains };
-  log(s, null, `Fin de la manche : ${name(s, s.finished[0])} est Président, ${name(s, last)} est Pauvre.`);
+  log(s, null, `Fin de la manche : ${name(s, s.finished[0])} est Président, ${name(s, last)} est Trouduc.`);
   if (s.round >= s.rounds) {
     s.phase = 'gameEnd';
     const best = Math.max(...s.scores);
